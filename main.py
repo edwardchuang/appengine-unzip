@@ -45,7 +45,7 @@ class CallbackUpload(blobstore_handlers.BlobstoreUploadHandler):
     if True == zipfile.is_zipfile(file_info.filename):
       return self.processUnzip(file_info.gs_object_name[3:], new_path, file_info.filename)
       # NOTREACHED
-    gcs.copy2(file_info.gs_object_name[3:], os.path.join(new_path, file_info.filename))
+    gcs.copy2(file_info.gs_object_name[3:], os.path.join(new_path, file_info.filename), {'content-type': file_info.content_type})
     gcs.delete(file_info.gs_object_name[3:]) # remove leading /gs
     rtn_data = {
       "gs_object_name": new_path,
