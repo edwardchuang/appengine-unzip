@@ -20,12 +20,15 @@ class PrepareUpload(webapp2.RequestHandler):
 
 class CallbackUpload(blobstore_handlers.BlobstoreUploadHandler):
   def processUnzip(self, filepath, gcs_path, filename):
+    mime = mimetypes2()
     tmpzip = gcs.open(filepath).read()
     objzip = zipfile.ZipFile(StringIO.StringIO(tmpzip), 'r')
     zip_files = []
     for file in objzip.namelist():
+      ext = os.path.splitext(file)[1]
+      content_type = mime.guess(ext) or 'application/octet-stream'
       target_path = os.path.join(gcs_path, file)
-      gcs_new = gcs.open(target_path, 'w')
+      gcs_new = gcs.open(target_path, 'w', content_type)
       z = objzip.open(file)
       gcs_new.write(z.read())
       gcs_new.close()
